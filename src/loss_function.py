@@ -13,9 +13,15 @@ def hdepp_loss_couple(emb_x, emb_y, phylo_dist_xy):
     return np.square((np.abs(emb_dist(emb_x, emb_y)) / phylo_dist_xy) - 1)
 
 
-def hdepp_loss(embeddings, phylo_distances):
+def hdepp_loss(embeddings, labels, reference):
     cost = 0
-    for e1 in embeddings:
-        for e2 in embeddings:
-            cost += hdepp_loss_couple(e1, e2, phylo_distances[e1][e2]) #depends on how the correct phylogenetic distances are stored
+    labeled_embs = [[label, emb]for emb in embeddings for label in labels]
+    
+    for node1 in labeled_embs:
+        for node2 in labeled_embs:
+            if node1[0] == node2[0]:
+                cost += 0
+                continue
+            cost += hdepp_loss_couple(node1[1], node2[1], reference[node1[0]][node2[0]]) 
+            #depends on how the correct phylogenetic distances are stored
     return cost
