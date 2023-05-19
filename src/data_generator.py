@@ -21,7 +21,8 @@ class DataGenerator(tf.keras.utils.Sequence):
 
     def __len__(self):
         'Denotes the number of batches per epoch'
-        return int(np.floor(len(self.list_IDs) / self.batch_size))
+        delta = 1 if len(self.list_IDs) % self.batch_size else 0 #
+        return int(np.floor(len(self.list_IDs) / self.batch_size + delta))
 
     def __getitem__(self, index):
         'Generate one batch of data'
@@ -52,10 +53,10 @@ class DataGenerator(tf.keras.utils.Sequence):
         for i, ID in enumerate(list_IDs_temp):
             # Store sample
             #X[i,] = np.load('data/' + ID + '.npy', allow_pickle = True)[0]
-            X[i,] = self.model_inputs[ID[0]][ID[1]][0 : 2]
+            X[i,] = self.model_inputs[ID][0][0]
 
             # Store class
             #y[i] = self.labels[ID]
-            y[i] = self.model_inputs[ID[0]][ID[1]][2]
+            y[i] = ID
 
         return X, tf.keras.utils.to_categorical(y, num_classes=self.n_classes)
