@@ -1,4 +1,5 @@
 import numpy as np
+import tensorflow as tf
 
 def emb_dist(x, y):
     #distance between embedding results, depending on the output of the network
@@ -12,16 +13,25 @@ def hdepp_loss_couple(emb_x, emb_y, phylo_dist_xy):
     #emb_dist can be change accordingly to the actual input
     return np.square((np.abs(emb_dist(emb_x, emb_y)) / phylo_dist_xy) - 1)
 
-#@
+#@tf.function
 def hdepp_loss(embeddings, labels, reference):
     cost = 0
-    labeled_embs = [[label, emb]for emb in embeddings for label in labels]
+    #labeled_embs = [[label, emb] for emb in embeddings for label in labels]
+    labeled_embs = [recon for recon in zip(labels, tf.convert_to_tensor(np.array(embeddings)))]
     
-    for node1 in labeled_embs:
-        for node2 in labeled_embs:
-            if node1[0] == node2[0]:
+    for i in range(0, 16):
+        node1 = labeled_embs[i]
+        
+        for j in range(0, 16):
+            node2 = labeled_embs[j]
+            node1_pos = tf.math.argmax(node1[0])
+            node2_pos = tf.math.argmax(node2[0])
+            
+            if node1_pos == node2_pos:
                 cost += 0
                 continue
-            cost += hdepp_loss_couple(node1[1], node2[1], reference[node1[0]][node2[0]]) 
+                
+            cost += hdepp_loss_couple(node1[1], node2[1], reference[node1_pos][node2_pos]) 
             #depends on how the correct phylogenetic distances are stored
+            
     return cost
