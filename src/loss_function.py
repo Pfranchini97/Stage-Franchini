@@ -2,14 +2,19 @@ import numpy as np
 import tensorflow as tf
 
 def emb_dist(x, y):
-    x = tf.math.sigmoid(x)
-    y = tf.math.sigmoid(y)
+    x
+    y
     #distance between embedding results, depending on the output of the network
-    res = tf.math.acosh(1 + tf.math.abs(2*tf.math.divide(tf.math.square(tf.norm(x-y)),
+    #res = tf.math.acosh(1 + tf.math.abs(2*tf.math.divide(tf.math.square(tf.norm(x-y)),
+    #                                                      tf.math.multiply(1 - tf.math.square(tf.norm(x)) ,
+    #                                                                       1 - tf.math.square(tf.norm(y)) ) ) ) ) 
+    
+    res = 1 + tf.math.abs(2*tf.math.divide(tf.math.square(tf.norm(x-y)),
                                                           tf.math.multiply(1 - tf.math.square(tf.norm(x)) ,
-                                                                           1 - tf.math.square(tf.norm(y)) ) ) ) ) 
-    return tf.norm(x-y)
-    #return res
+                                                                           1 - tf.math.square(tf.norm(y)) ) ) )
+    res = tf.math.log(res + tf.math.sqrt(tf.math.square(res) + 1))
+    #return tf.norm(x-y)
+    return res
 
 
 
@@ -17,7 +22,7 @@ def emb_dist(x, y):
 def hdepp_loss_couple(emb_x, emb_y, phylo_dist_xy):
     
     #emb_dist can be change accordingly to the actual input
-    return tf.math.square(tf.math.divide(tf.math.abs(emb_dist(emb_x, emb_y)) , tf.cast(phylo_dist_xy, tf.float64)) - 1)
+    return tf.math.square(tf.math.divide(tf.math.abs(emb_dist(emb_x, emb_y)) , tf.cast(phylo_dist_xy, tf.float32)) - 1)
     
 
 #@tf.function
